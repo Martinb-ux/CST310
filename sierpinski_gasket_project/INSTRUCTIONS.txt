@@ -62,14 +62,13 @@ COMPILATION INSTRUCTIONS
 Compile each program using one of these commands:
 
 For 2D Random Method:
-g++ -o gasket_2d_random gasket_2d_random.cpp -framework OpenGL -framework GLUT
+g++ -Wall -O2 -DGL_SILENCE_DEPRECATION -o gasket_2d_random gasket_2d_random.cpp -framework OpenGL -framework GLUT
 
 For 2D Subdivision Method:
-g++ -o gasket_2d_subdivision gasket_2d_subdivision.cpp -framework OpenGL -framework GLUT
+g++ -Wall -O2 -DGL_SILENCE_DEPRECATION -o gasket_2d_subdivision gasket_2d_subdivision.cpp -framework OpenGL -framework GLUT
 
 For 3D Tetrahedron Method:
-g++ -o gasket_3d_tetrahedron gasket_3d_tetrahedron.cpp -framework OpenGL -framework GLUT
-
+g++ -Wall -O2 -DGL_SILENCE_DEPRECATION -o gasket_3d_tetrahedron gasket_3d_tetrahedron.cpp -framework OpenGL -framework GLUT
 
 --- Linux ---
 Compile each program using one of these commands:

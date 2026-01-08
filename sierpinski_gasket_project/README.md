@@ -472,6 +472,22 @@ The gasket is the unique attractor of this IFS, which is why the random method c
 
 ---
 
+## macOS OpenGL deprecation note
+
+On recent versions of macOS the legacy OpenGL API is marked deprecated by Apple and the system headers may emit deprecation warnings when compiling. This repository intentionally uses legacy OpenGL/GLUT for simplicity and educational purposes.
+
+Workaround included in this project:
+
+- The `Makefile` defines `GL_SILENCE_DEPRECATION` in `CXXFLAGS` so the compiler will not print deprecation warnings when building on macOS.
+
+If you want to remove the warnings manually instead, you can either:
+
+- Define the macro on the compiler command-line: `-DGL_SILENCE_DEPRECATION`.
+- Or set it inside source files before including OpenGL headers (not necessary here because the Makefile handles it).
+
+Note: Silencing warnings does not change the fact that OpenGL is deprecated on macOS; for production or forward-looking code, consider porting rendering to Metal or using a cross-platform modern OpenGL setup with an abstraction layer.
+
+
 ## Future Enhancements
 
 Possible extensions to explore:

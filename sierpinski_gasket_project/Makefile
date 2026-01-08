@@ -8,7 +8,8 @@ UNAME_S := $(shell uname -s)
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -Wall -O2
+# Define GL_SILENCE_DEPRECATION to suppress macOS OpenGL deprecation warnings
+CXXFLAGS = -Wall -O2 -DGL_SILENCE_DEPRECATION
 
 # Output executables
 TARGET_2D_RANDOM = gasket_2d_random
