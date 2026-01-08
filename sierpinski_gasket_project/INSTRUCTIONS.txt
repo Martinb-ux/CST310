@@ -1,0 +1,372 @@
+================================================================================
+SIERPINSKI GASKET PROJECT - BUILD AND RUN INSTRUCTIONS
+================================================================================
+
+PROJECT OVERVIEW
+----------------
+This project contains three C++ programs that render different versions of the
+Sierpinski Gasket using OpenGL. Each program is self-contained and can be
+compiled and run independently.
+
+FILES INCLUDED
+--------------
+1. gasket_2d_random.cpp       - 2D version using random point method
+2. gasket_2d_subdivision.cpp  - 2D version using recursive subdivision
+3. gasket_3d_tetrahedron.cpp  - 3D version using tetrahedron subdivision
+4. README.md                  - Comprehensive documentation
+5. INSTRUCTIONS.txt           - This file
+
+
+================================================================================
+SOFTWARE REQUIREMENTS
+================================================================================
+
+REQUIRED LIBRARIES
+------------------
+1. OpenGL (usually pre-installed on most systems)
+2. GLUT (OpenGL Utility Toolkit) or FreeGLUT
+3. GLU (OpenGL Utility Library)
+4. C++ compiler (g++, clang++, or MSVC)
+
+PLATFORM-SPECIFIC REQUIREMENTS
+-------------------------------
+
+--- macOS ---
+• Xcode Command Line Tools (includes OpenGL, GLU, GLUT)
+  Install with: xcode-select --install
+• Alternatively, use Homebrew to install freeglut:
+  brew install freeglut
+
+--- Linux (Ubuntu/Debian) ---
+• Build essentials: sudo apt-get install build-essential
+• FreeGLUT: sudo apt-get install freeglut3-dev
+• OpenGL and GLU: sudo apt-get install libglu1-mesa-dev
+
+--- Linux (Fedora/RHEL) ---
+• sudo dnf install gcc-c++
+• sudo dnf install freeglut-devel
+• sudo dnf install mesa-libGLU-devel
+
+--- Windows ---
+• Install MinGW-w64 or Visual Studio
+• Download FreeGLUT binaries from:
+  https://www.transmissionzero.co.uk/software/freeglut-devel/
+• Extract and place include/lib files in appropriate directories
+
+
+================================================================================
+COMPILATION INSTRUCTIONS
+================================================================================
+
+--- macOS ---
+Compile each program using one of these commands:
+
+For 2D Random Method:
+g++ -o gasket_2d_random gasket_2d_random.cpp -framework OpenGL -framework GLUT
+
+For 2D Subdivision Method:
+g++ -o gasket_2d_subdivision gasket_2d_subdivision.cpp -framework OpenGL -framework GLUT
+
+For 3D Tetrahedron Method:
+g++ -o gasket_3d_tetrahedron gasket_3d_tetrahedron.cpp -framework OpenGL -framework GLUT
+
+
+--- Linux ---
+Compile each program using one of these commands:
+
+For 2D Random Method:
+g++ -o gasket_2d_random gasket_2d_random.cpp -lGL -lGLU -lglut
+
+For 2D Subdivision Method:
+g++ -o gasket_2d_subdivision gasket_2d_subdivision.cpp -lGL -lGLU -lglut
+
+For 3D Tetrahedron Method:
+g++ -o gasket_3d_tetrahedron gasket_3d_tetrahedron.cpp -lGL -lGLU -lglut
+
+
+--- Windows (MinGW) ---
+Ensure freeglut is installed and accessible, then:
+
+For 2D Random Method:
+g++ -o gasket_2d_random.exe gasket_2d_random.cpp -lfreeglut -lopengl32 -lglu32
+
+For 2D Subdivision Method:
+g++ -o gasket_2d_subdivision.exe gasket_2d_subdivision.cpp -lfreeglut -lopengl32 -lglu32
+
+For 3D Tetrahedron Method:
+g++ -o gasket_3d_tetrahedron.exe gasket_3d_tetrahedron.cpp -lfreeglut -lopengl32 -lglu32
+
+
+--- Windows (Visual Studio) ---
+1. Create a new Console Application project
+2. Add the .cpp file to the project
+3. Configure project properties:
+   - C/C++ > General > Additional Include Directories: [path to freeglut include]
+   - Linker > General > Additional Library Directories: [path to freeglut lib]
+   - Linker > Input > Additional Dependencies: freeglut.lib opengl32.lib glu32.lib
+4. Build and run
+
+
+================================================================================
+RUNNING THE PROGRAMS
+================================================================================
+
+--- macOS / Linux ---
+After compilation, run each program:
+./gasket_2d_random
+./gasket_2d_subdivision
+./gasket_3d_tetrahedron
+
+--- Windows ---
+gasket_2d_random.exe
+gasket_2d_subdivision.exe
+gasket_3d_tetrahedron.exe
+
+
+================================================================================
+INTERACTIVE CONTROLS
+================================================================================
+
+PROGRAM 1: 2D Random Point Method (gasket_2d_random)
+-----------------------------------------------------
+Key         Action
++/=         Increase number of points by 5,000
+-/_         Decrease number of points by 5,000
+R           Regenerate with new random sequence
+ESC         Exit program
+
+Description: Watch as thousands of randomly placed points converge to form
+the Sierpinski Gasket pattern. Adjust the point count to see how density
+affects the final image quality.
+
+
+PROGRAM 2: 2D Subdivision Method (gasket_2d_subdivision)
+---------------------------------------------------------
+Key         Action
++/=         Increase subdivision depth (max 8)
+-/_         Decrease subdivision depth (min 0)
+SPACE       Toggle between filled and wireframe mode
+R           Reset to default settings
+ESC         Exit program
+
+Description: See the fractal built through recursive triangle subdivision.
+Each depth level adds more detail. Wireframe mode reveals the internal
+structure beautifully.
+
+
+PROGRAM 3: 3D Tetrahedron Method (gasket_3d_tetrahedron)
+---------------------------------------------------------
+Key         Action
++/=         Increase subdivision depth (max 6)
+-/_         Decrease subdivision depth (min 0)
+Arrow Up    Rotate up (around X-axis)
+Arrow Down  Rotate down (around X-axis)
+Arrow Left  Rotate left (around Y-axis)
+Arrow Right Rotate right (around Y-axis)
+SPACE       Toggle automatic rotation animation
+W           Toggle wireframe mode
+R           Reset rotation to default view
+ESC         Exit program
+
+Description: Explore the 3D Sierpinski tetrahedron! Rotate it manually or
+enable auto-rotation. The four faces are colored differently (red, green,
+blue, yellow) for easy visualization.
+
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+PROBLEM: "GL/glut.h: No such file or directory"
+SOLUTION: 
+  - macOS: Install Xcode Command Line Tools
+  - Linux: Install freeglut3-dev package
+  - Windows: Ensure FreeGLUT is properly installed and include path is set
+
+PROBLEM: Linker errors about undefined references to OpenGL functions
+SOLUTION: 
+  - Ensure you're linking against the correct libraries
+  - macOS: Use -framework OpenGL -framework GLUT
+  - Linux: Use -lGL -lGLU -lglut
+  - Windows: Use -lopengl32 -lglu32 -lfreeglut
+
+PROBLEM: Black screen or window doesn't open
+SOLUTION:
+  - Ensure your graphics drivers support OpenGL
+  - Try updating your graphics drivers
+  - Check terminal output for error messages
+
+PROBLEM: Program runs but displays incorrectly
+SOLUTION:
+  - Try different subdivision depths (some GPUs have limits)
+  - Check if your system supports the required OpenGL version
+  - Try running in windowed mode (should be default)
+
+PROBLEM: Compilation warnings about deprecated functions
+SOLUTION:
+  - This is normal with GLUT on newer systems
+  - The code will still work correctly
+  - For production code, consider migrating to modern OpenGL with GLFW
+
+
+================================================================================
+EXPECTED OUTPUT
+================================================================================
+
+2D Random Method:
+- Window displays three red vertices forming a triangle
+- Green dots fill in to create the Sierpinski triangle pattern
+- More points = smoother, more filled-in pattern
+
+2D Subdivision Method:
+- Window displays a fractal triangle pattern
+- Higher depth = more intricate, detailed pattern
+- Wireframe mode shows the recursive triangle structure
+- Color changes based on subdivision depth
+
+3D Tetrahedron Method:
+- Window displays a 3D pyramid-like structure with holes
+- Four different colored faces (red, green, blue, yellow)
+- Can be rotated to view from different angles
+- Higher depth creates more complex, sponge-like structure
+
+
+================================================================================
+PERFORMANCE NOTES
+================================================================================
+
+2D Random Method:
+- Performance: O(n) where n = number of points
+- Recommended range: 10,000 - 100,000 points
+- Very efficient even with high point counts
+
+2D Subdivision Method:
+- Performance: O(3^depth)
+- Depth 0-5: Very fast, real-time
+- Depth 6-7: Noticeable rendering time
+- Depth 8: May be slow on older hardware (6,561 triangles)
+
+3D Tetrahedron Method:
+- Performance: O(4^depth)
+- Depth 0-4: Very fast, smooth rotation
+- Depth 5: Moderate performance
+- Depth 6: May be slow on older hardware (16,384 triangles)
+- Uses depth buffering which adds overhead
+
+
+================================================================================
+TAKING SCREENSHOTS
+================================================================================
+
+--- macOS ---
+1. Run the program
+2. Press Cmd+Shift+4, then press Space
+3. Click on the program window
+4. Screenshot saved to Desktop
+
+--- Linux (GNOME) ---
+1. Run the program
+2. Press PrtScn or use Screenshot application
+3. Select the window
+
+--- Windows ---
+1. Run the program
+2. Press Alt+PrtScn to capture active window
+3. Paste into Paint or image editor
+4. Save the image
+
+
+================================================================================
+CREATING ZIP FILE FOR SUBMISSION
+================================================================================
+
+--- macOS / Linux ---
+cd /path/to/project/directory
+zip -r sierpinski_gasket_submission.zip gasket_2d_random.cpp gasket_2d_subdivision.cpp gasket_3d_tetrahedron.cpp README.md INSTRUCTIONS.txt
+
+Or include screenshots:
+zip -r sierpinski_gasket_submission.zip *.cpp *.md *.txt *.png
+
+--- Windows ---
+1. Select all project files
+2. Right-click > Send to > Compressed (zipped) folder
+3. Rename to sierpinski_gasket_submission.zip
+
+
+================================================================================
+TESTING CHECKLIST
+================================================================================
+
+Before submitting, verify:
+[ ] All three programs compile without errors
+[ ] All three programs run and display correctly
+[ ] Interactive controls work (test each key binding)
+[ ] Screenshots taken of all three programs
+[ ] README.md is complete with all sections
+[ ] All source code has meaningful comments
+[ ] INSTRUCTIONS.txt is included
+[ ] All files are included in the zip file
+
+
+================================================================================
+ADDITIONAL RESOURCES
+================================================================================
+
+OpenGL Documentation:
+- https://www.opengl.org/documentation/
+- https://www.khronos.org/opengl/wiki/
+
+GLUT Documentation:
+- https://www.opengl.org/resources/libraries/glut/
+
+FreeGLUT:
+- http://freeglut.sourceforge.net/
+
+Sierpinski Gasket Background:
+- https://en.wikipedia.org/wiki/Sierpi%C5%84ski_triangle
+- "Fractals Everywhere" by Michael Barnsley
+
+OpenGL Tutorials:
+- https://learnopengl.com/
+- http://www.opengl-tutorial.org/
+
+
+================================================================================
+CONTACT AND SUPPORT
+================================================================================
+
+If you encounter issues:
+1. Check the troubleshooting section above
+2. Verify all requirements are installed
+3. Check compiler and linker flags
+4. Review error messages carefully
+5. Ensure graphics drivers are up to date
+
+Common success indicators:
+- Compilation completes with 0 errors (warnings are OK)
+- Window opens with black background
+- Fractal pattern is visible and interactive
+- Controls respond as documented
+
+
+================================================================================
+VERSION INFORMATION
+================================================================================
+
+Project Version: 1.0
+Date: January 2026
+Course: Computer Graphics - Introduction to OpenGL
+Assignment: Sierpinski Gasket Implementation
+
+Tested on:
+- macOS 13+ (Apple Silicon and Intel)
+- Ubuntu 22.04 LTS
+- Windows 10/11
+
+OpenGL Version Required: 2.0 or higher (legacy OpenGL)
+GLUT Version: Any (GLUT 3.7+ or FreeGLUT 2.8+)
+
+
+================================================================================
+END OF INSTRUCTIONS
+================================================================================
