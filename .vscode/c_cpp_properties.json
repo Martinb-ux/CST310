@@ -4,10 +4,9 @@
             "name": "Mac",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/local/include",
-                "/usr/local/opt/glfw/include",
-                "/usr/local/opt/glew/include",
-                "/usr/local/opt/soil/include"
+                "/opt/homebrew/include",
+                "/opt/homebrew/opt/glfw/include",
+                "/opt/homebrew/opt/glew/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
