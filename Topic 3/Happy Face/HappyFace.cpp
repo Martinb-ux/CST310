@@ -8,7 +8,8 @@
 #include <GLFW/glfw3.h>
 
 // Other Libs
-#include <SOIL/SOIL.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 // Other includes
 #include "Shader.h"
@@ -29,10 +30,16 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
     // Create a GLFWwindow object that we can use for GLFW's functions
     GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "HappyFace with Texture", nullptr, nullptr);
+    if (window == nullptr) {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
     glfwMakeContextCurrent(window);
 
     // Set the required callback functions
@@ -105,12 +112,12 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // Load, create texture and generate mipmaps
-    int width, height;
+    int width, height, nrChannels;
     
-    unsigned char* image = SOIL_load_image("Container1.jpg", &width, &height, 0, SOIL_LOAD_RGB);
+    unsigned char* image = stbi_load("Container1.jpg", &width, &height, &nrChannels, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
     glGenerateMipmap(GL_TEXTURE_2D);
-    SOIL_free_image_data(image);
+    stbi_image_free(image);
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture when done, so we won't accidentily mess up our texture.
     
     // ===================
@@ -126,10 +133,11 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // Load, create texture and generate mipmaps
-    image = SOIL_load_image("awesomeface.png", &width, &height, 0, SOIL_LOAD_RGB);
+    stbi_set_flip_vertically_on_load(true);
+    image = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
     glGenerateMipmap(GL_TEXTURE_2D);
-    SOIL_free_image_data(image);
+    stbi_image_free(image);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Game loop
