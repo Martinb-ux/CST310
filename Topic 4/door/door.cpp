@@ -23,6 +23,7 @@ float gPitchDeg = 0.0f;
 
 bool gKeys[256] = { false };
 bool gSpecial[256] = { false };
+bool gUseOrtho = false;
 
 int gPrevTimeMs = 0;
 
@@ -288,11 +289,31 @@ void Reshape(int w, int h) {
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(60.0, (double)w / (double)h, 0.1, 100.0);
+
+  double aspect = (double)w / (double)h;
+
+  if (gUseOrtho) {
+    // Ortho "box" size (adjust as needed)
+    double s = 3.5;
+    if (aspect >= 1.0)
+      glOrtho(-s * aspect, s * aspect, -s, s, 0.1, 100.0);
+    else
+      glOrtho(-s, s, -s / aspect, s / aspect, 0.1, 100.0);
+  } else {
+    gluPerspective(60.0, aspect, 0.1, 100.0);
+  }
 }
 
 void KeyboardDown(unsigned char key, int, int) {
   gKeys[key] = true;
+
+  if (key == 'p' || key == 'P') {
+    gUseOrtho = !gUseOrtho;
+    int w = glutGet(GLUT_WINDOW_WIDTH);
+    int h = glutGet(GLUT_WINDOW_HEIGHT);
+    Reshape(w, h); // re-apply projection immediately
+  }
+
   if (key == 27) std::exit(0); // ESC
 }
 
