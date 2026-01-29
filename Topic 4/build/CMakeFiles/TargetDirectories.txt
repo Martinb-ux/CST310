@@ -1,0 +1,3 @@
+/Users/elikaustinen/Documents/GitHub/CST310/Topic 4/build/CMakeFiles/stairwell_scene.dir
+/Users/elikaustinen/Documents/GitHub/CST310/Topic 4/build/CMakeFiles/edit_cache.dir
+/Users/elikaustinen/Documents/GitHub/CST310/Topic 4/build/CMakeFiles/rebuild_cache.dir
