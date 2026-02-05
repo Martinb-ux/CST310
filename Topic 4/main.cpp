@@ -15,6 +15,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <string>
 
 // Window dimensions
 const unsigned int SCREEN_WIDTH = 1200;
@@ -127,8 +128,15 @@ int main() {
     // Configure OpenGL
     glEnable(GL_DEPTH_TEST);
 
-    // Load and compile shaders
-    unsigned int shaderProgram = loadShader("vertex_shader.glsl", "fragment_shader.glsl");
+    // Load and compile shaders (use source file directory so shaders are found
+    // even if the program is launched from a different working directory)
+    std::string shaderDir = __FILE__;
+    size_t pos = shaderDir.find_last_of("/\\");
+    if (pos != std::string::npos) shaderDir = shaderDir.substr(0, pos);
+    else shaderDir = ".";
+    std::string vertPath = shaderDir + "/vertex_shader.glsl";
+    std::string fragPath = shaderDir + "/fragment_shader.glsl";
+    unsigned int shaderProgram = loadShader(vertPath.c_str(), fragPath.c_str());
 
     // Set up vertex data and buffers
     glGenVertexArrays(1, &cubeVAO);

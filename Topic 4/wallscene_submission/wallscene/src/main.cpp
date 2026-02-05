@@ -27,6 +27,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <cmath>
 #include <random>
 

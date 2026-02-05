@@ -11,7 +11,11 @@
  * - +/-: Increase/decrease number of iterations
  */
 
+#if defined(__APPLE__)
 #include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
