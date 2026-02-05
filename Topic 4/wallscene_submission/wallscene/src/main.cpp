@@ -657,12 +657,12 @@ void initializeScene() {
     sceneObjects.push_back(createSceneObject(topFrameVerts, "Frame Top"));
 
     // ============================================================
-    // DOOR WINDOW - Narrow vertical window with wire mesh glass (matching real photo)
+    // DOOR WINDOW - Narrow vertical window on upper-left with wire mesh glass
     // ============================================================
-    float windowWidth = 0.08f;   // Narrow window
-    float windowHeight = 0.50f;  // Taller window
-    float windowY = doorHeight * 0.62f;  // Positioned higher
-    float windowX = doorX;  // Centered on door
+    float windowWidth = 0.15f;   // Smaller window
+    float windowHeight = 0.70f;  // Smaller window
+    float windowY = doorHeight * 0.75f;  // Positioned higher
+    float windowX = doorX - doorWidth/2 + 0.25f;  // Moved further left
     float windowZ = doorZ + doorThick/2;
 
     // Window frame (steel) - dark gray
@@ -716,68 +716,60 @@ void initializeScene() {
     sceneObjects.push_back(createSceneObject(glassHighlightVerts, "Glass Highlight"));
 
     // ============================================================
-    // DOOR HARDWARE - Handle on RIGHT (push bar side), hinges on LEFT
+    // DOOR HARDWARE - Handle on LEFT, hinges on RIGHT (matching door.cpp)
     // ============================================================
 
-    // Handle side is RIGHT when looking at door
-    float handleX = doorX + doorWidth/2 - 0.10f;
-    float handleY = 1.02f;  // Standard 40" AFF
+    // Handle side is LEFT when looking at door
+    float handleBaseX = doorX - doorWidth/2 + 0.10f;  // Moved further left
+    float handleBaseY = doorHeight * 0.50f;  // Mid-door height
 
-    // Push bar backplate
+    // Handle base plate (on left side of door)
     auto handlePlateVerts = createBox(
-        glm::vec3(handleX, handleY, windowZ + 0.015f),
-        glm::vec3(0.06f, 0.18f, 0.008f),
+        glm::vec3(handleBaseX, handleBaseY, windowZ + 0.015f),
+        glm::vec3(0.10f, 0.18f, 0.03f),
         handleColor * 0.9f
     );
     sceneObjects.push_back(createSceneObject(handlePlateVerts, "Handle Plate"));
 
-    // Push bar lever
+    // Handle lever (extends to the right)
     auto handleVerts = createBox(
-        glm::vec3(handleX - 0.02f, handleY, windowZ + 0.035f),
-        glm::vec3(0.10f, 0.022f, 0.022f),
+        glm::vec3(handleBaseX + 0.09f, handleBaseY, windowZ + 0.04f),
+        glm::vec3(0.22f, 0.04f, 0.08f),
         handleColor
     );
     sceneObjects.push_back(createSceneObject(handleVerts, "Handle"));
 
-    // Hinges on LEFT side (3 hinges for commercial door)
-    float hingeX = doorX - doorWidth/2 + 0.05f;
-    float hingeZ = doorZ - doorThick/2;
-    for (float hingeY : {0.25f, 1.07f, 1.90f}) {
+    // Hinges on RIGHT side (3 hinges for commercial door)
+    float hingeX = doorX + doorWidth/2 - 0.025f;
+    float hingeZ = doorZ + doorThick/2 * 0.55f;
+    for (float hingeY : {doorHeight * 0.18f, doorHeight * 0.50f, doorHeight * 0.82f}) {
         auto hingeVerts = createBox(
-            glm::vec3(hingeX, hingeY, hingeZ - 0.01f),
-            glm::vec3(0.03f, 0.10f, 0.02f),
+            glm::vec3(hingeX, hingeY, hingeZ),
+            glm::vec3(0.03f, 0.10f, 0.07f),  // Even smaller hinges
             handleColor * 0.85f
         );
         sceneObjects.push_back(createSceneObject(hingeVerts, "Hinge"));
     }
 
-    // Door closer (prominently visible at top right of door, matching real photo)
-    float closerY = doorHeight - 0.06f;
-    float closerX = doorX + doorWidth/2 - 0.15f;
+    // Door closer (top bar, matching door.cpp style)
+    float closerY = doorHeight - 0.05f;  // Moved up
+    float closerX = doorX + 0.30f;
 
-    // Closer body (cylinder-like box)
+    // Closer main body
     auto closerBodyVerts = createBox(
-        glm::vec3(closerX, closerY, windowZ + 0.04f),
-        glm::vec3(0.22f, 0.05f, 0.055f),
-        glm::vec3(0.55f, 0.55f, 0.55f)  // Silver/chrome
+        glm::vec3(closerX, closerY, windowZ + 0.065f),
+        glm::vec3(0.20f, 0.05f, 0.07f),
+        glm::vec3(0.65f, 0.65f, 0.65f)
     );
     sceneObjects.push_back(createSceneObject(closerBodyVerts, "Door Closer"));
 
-    // Closer arm (extends from closer to frame)
+    // Closer arm (thin bar)
     auto closerArmVerts = createBox(
-        glm::vec3(closerX + 0.15f, closerY + 0.01f, windowZ + 0.05f),
-        glm::vec3(0.12f, 0.018f, 0.018f),
+        glm::vec3(doorX + 0.07f, closerY, windowZ + 0.070f),
+        glm::vec3(0.35f, 0.02f, 0.03f),
         glm::vec3(0.60f, 0.60f, 0.60f)
     );
     sceneObjects.push_back(createSceneObject(closerArmVerts, "Closer Arm"));
-
-    // Arm bracket on frame
-    auto closerBracketVerts = createBox(
-        glm::vec3(doorX + doorWidth/2 + 0.04f, closerY + 0.01f, windowZ + 0.03f),
-        glm::vec3(0.03f, 0.04f, 0.025f),
-        glm::vec3(0.55f, 0.55f, 0.55f)
-    );
-    sceneObjects.push_back(createSceneObject(closerBracketVerts, "Closer Bracket"));
 
     // ============================================================
     // WALL-MOUNTED LIGHT FIXTURE - Above door on back wall (matching real photo)
