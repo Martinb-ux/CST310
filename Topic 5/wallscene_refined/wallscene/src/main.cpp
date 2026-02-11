@@ -34,9 +34,9 @@
 const unsigned int WINDOW_WIDTH = 1280;
 const unsigned int WINDOW_HEIGHT = 720;
 
-// Camera - centered view showing all three walls
-glm::vec3 cameraPos = glm::vec3(0.0f, 1.5f, 3.2f);  // Centered, eye level, pulled back
-glm::vec3 cameraFront = glm::vec3(0.0f, -0.05f, -1.0f);
+// Camera - adjusted to match reference photo
+glm::vec3 cameraPos = glm::vec3(0.0f, 1.8f, 3.5f);  // Slightly higher and further back
+glm::vec3 cameraFront = glm::vec3(0.0f, -0.2f, -1.0f);  // Looking slightly more downward
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 float yaw = -90.0f;  // Looking straight ahead
 float pitch = -3.0f;
@@ -488,8 +488,8 @@ void initializeScene() {
     // COLORS - Precisely matching real scene
     // ============================================================
     glm::vec3 brickColor(0.76f, 0.52f, 0.44f);        // Salmon/terracotta CMU (warmer)
-    glm::vec3 floorColor(0.78f, 0.76f, 0.73f);        // Light beige-gray concrete
-    glm::vec3 ceilingColor(0.90f, 0.88f, 0.85f);      // Light cream ceiling
+    glm::vec3 floorColor(0.68f, 0.66f, 0.65f);        // Darker gray concrete
+    glm::vec3 ceilingColor(0.75f, 0.73f, 0.72f);      // Darker ceiling
     glm::vec3 doorColor(0.45f, 0.47f, 0.49f);         // Medium gray metal door
     glm::vec3 doorWornColor(0.50f, 0.52f, 0.54f);     // Slightly lighter worn edges
     glm::vec3 doorFrameColor(0.38f, 0.40f, 0.42f);    // Steel frame
@@ -501,7 +501,7 @@ void initializeScene() {
     glm::vec3 fixtureColor(0.92f, 0.92f, 0.90f);      // White light fixture
 
     float roomWidth = 3.5f;
-    float roomHeight = 2.75f;
+    float roomHeight = 3.5f;  // Increased from 2.75m to 3.5m to make walls taller
     float roomDepth = 3.5f;
 
     // ============================================================
@@ -578,6 +578,17 @@ void initializeScene() {
     }
 
     sceneObjects.push_back(createSceneObject(floorVerts, "Floor"));
+
+    // ============================================================
+    // LIGHTING - Harsh fluorescent light matching reference photo
+    // ============================================================
+    // Light position (moved closer to left wall, near ceiling)
+    glm::vec3 lightPos(-2.0f, roomHeight - 0.5f, roomDepth/2.5f);  // Further left and slightly lower
+    float lightRadius = 0.8f;  // More focused beam
+    
+    // Adjust light properties for harsher, more direct lighting
+    float lightIntensity = 0.2f;  // Increased intensity
+    float lightAmbient = 0.02f;   // Reduced ambient light for stronger shadows
 
     // ============================================================
     // CEILING - Darker, institutional
@@ -1088,6 +1099,22 @@ int main() {
     GLint lightPosLoc = glGetUniformLocation(shaderProgram, "lightPos");
     GLint viewPosLoc = glGetUniformLocation(shaderProgram, "viewPos");
     GLint ambientLoc = glGetUniformLocation(shaderProgram, "ambientStrength");
+
+    // Light properties - positioned closer to left wall
+    glm::vec3 lightPos(-2.0f, 3.5f - 0.5f, 3.5f/2.5f);  // Matches the position in initializeScene() // Matches the position in initializeScene()
+    glm::vec3 lightColor(0.90f, 0.90f, 0.80f);  // Warmer, dimmer white
+    float lightRadius = 0.01f;  // More focused light
+    float lightIntensity = 0.01f;  // Significantly reduced from 0.8f
+    float lightAmbient = 0.01f;   // Reduced from 0.05f
+
+    // Set up lighting uniform
+    glUniform3f(glGetUniformLocation(shaderProgram, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+    glUniform3f(glGetUniformLocation(shaderProgram, "lightColor"), 
+                lightColor.r * lightIntensity, 
+                lightColor.g * lightIntensity, 
+                lightColor.b * lightIntensity);
+    glUniform1f(glGetUniformLocation(shaderProgram, "lightRadius"), lightRadius);
+    glUniform1f(glGetUniformLocation(shaderProgram, "ambientStrength"), lightAmbient);
 
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();

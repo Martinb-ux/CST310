@@ -1,4 +1,4 @@
-# Project 4: Stairwell Scene - OpenGL Rendering
+ # Project 4: Stairwell Scene - OpenGL Rendering
 
 ## Table of Contents
 1. [Project Overview](#project-overview)
