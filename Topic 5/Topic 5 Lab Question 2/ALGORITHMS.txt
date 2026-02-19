@@ -1,0 +1,111 @@
+QUADRILATERAL MESH ALGORITHMS
+============================
+
+1. DATA STRUCTURES
+==================
+
+struct Vertex {
+    float x, y, z;      // Position
+    float nx, ny, nz;    // Normal vector
+    float u, v;          // Texture coords
+    float r, g, b;       // Color
+};
+
+struct Quad {
+    int v0, v1, v2, v3;  // Vertex indices
+};
+
+class QuadrilateralMesh {
+    vector<Vertex> vertices;
+    vector<Quad> quads;
+};
+
+============================
+2. NORMAL CALCULATION
+====================
+
+Triangle Normal Algorithm:
+1. edge1 = v2 - v1, edge2 = v3 - v1
+2. normal = edge1 × edge2
+   nx = edge1.y*edge2.z - edge1.z*edge2.y
+   ny = edge1.z*edge2.x - edge1.x*edge2.z
+   nz = edge1.x*edge2.y - edge1.y*edge2.x
+3. Normalize: divide by length
+
+Vertex Normal Algorithm:
+1. For each quad: calculate face normal
+2. Add face normal to all 4 vertices
+3. Normalize all vertex normals
+
+============================
+3. MESH GENERATION
+==================
+
+Grid Mesh:
+- Create vertices in regular grid pattern
+- Connect vertices into quads
+- Complexity: O(W×H)
+
+Height Field:
+- Same as grid, but y = f(x,z)
+- Use mathematical function for terrain
+- Example: y = sin(x)*cos(z) + 0.5*sin(2x)*sin(2z)
+
+============================
+4. SHADING ALGORITHMS
+====================
+
+Flat Shading:
+- One normal per quad
+- glBegin(GL_QUADS) with single glNormal3f()
+- Faceted appearance
+- glShadeModel(GL_FLAT)
+
+Smooth Shading:
+- Different normal per vertex
+- glNormal3f() before each glVertex3f()
+- Smooth surface appearance
+- glShadeModel(GL_SMOOTH)
+
+Gouraud Shading:
+- Same as smooth + OpenGL lighting
+- glEnable(GL_LIGHTING)
+- Per-vertex lighting calculation
+
+Phong Shading (approx):
+- Enhanced smooth shading
+- Multiple light sources
+- Better normal interpolation
+
+============================
+5. COLOR MAPPING
+===============
+
+Height-Based:
+t = (y - min) / (max - min)
+color.r = t, color.b = 1-t
+
+Slope-Based:
+slope = sqrt(nx² + nz²)
+color.r = slope, color.g = 1-slope
+
+============================
+6. USAGE EXAMPLE
+================
+
+QuadrilateralMesh mesh;
+mesh.createHeightField(40, 40, heightFunction, -8, 8, -8, 8);
+mesh.calculateNormals();
+mesh.setColorsFromHeight(min, max);
+mesh.renderSmoothShading();
+
+============================
+7. COMPLEXITY
+=============
+
+- Normal calculation: O(V + F)
+- Mesh generation: O(W × H)
+- Rendering: O(F) for flat, O(F×4) for smooth
+- Memory: O(V + F)
+
+============================
