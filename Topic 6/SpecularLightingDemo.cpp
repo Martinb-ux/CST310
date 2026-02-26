@@ -1,9 +1,19 @@
 // SpecularLightingDemo.cpp
 // Demonstrates visual impact of different shininess values on specular lighting
-// Build: g++ SpecularLightingDemo.cpp -o specular_demo -lglut -lGL -lGLU
-// (On Windows with FreeGLUT: link against freeglut, opengl32, glu32)
+// Build: make (or g++ SpecularLightingDemo.cpp -o specular_demo -lglut -lGL -lGLU)
+// (On macOS: g++ SpecularLightingDemo.cpp -o specular_demo -framework OpenGL -framework GLUT)
+// (On Windows: g++ SpecularLightingDemo.cpp -o specular_demo.exe -lopengl32 -lglu32 -lfreeglut)
 
-#include <GLUT/glut.h>
+// Platform-specific OpenGL headers
+#ifdef __APPLE__
+    #include <GLUT/glut.h>
+#elif defined(_WIN32) || defined(_WIN64)
+    #include <GL/glut.h>
+#else
+    // Linux and other Unix-like systems
+    #include <GL/glut.h>
+#endif
+
 #include <cmath>
 #include <cstdlib>
 #include <vector>
