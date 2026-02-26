@@ -33,7 +33,7 @@ struct Camera {
     float ux, uy, uz;
 };
 
-Camera gCamera = { 0.0f, 2.5f, 9.0f,   0.0f, 0.0f, 0.0f,   0.0f, 1.0f, 0.0f };
+Camera gCamera = { 0.0f, 3.0f, 8.0f,   0.0f, 1.5f, 0.0f,   0.0f, 1.0f, 0.0f };
 
 // -----------------------------
 // Cube with shininess value
@@ -43,6 +43,7 @@ struct SpecularCube {
     float position[3];
     float color[3];
     const char* label;
+    float rotation; // Individual rotation for each cube
 };
 
 std::vector<SpecularCube> gCubes;
@@ -56,16 +57,16 @@ void InitCubes() {
     float orangeColor[3] = {0.9f, 0.45f, 0.1f}; // More orange, less saturated
     
     gCubes = {
-        // Top row: 2, 4, 8, 16 (low to high)
-        { 2.0f,   {-4.5f, 3.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "2" },
-        { 4.0f,   {-1.5f, 3.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "4" },
-        { 8.0f,   { 1.5f, 3.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "8" },
-        { 16.0f,  { 4.5f, 3.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "16" },
-        // Bottom row: 32, 64, 128, 256 (low to high)
-        { 32.0f,  {-4.5f, 1.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "32" },
-        { 64.0f,  {-1.5f, 1.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "64" },
-        { 128.0f, { 1.5f, 1.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "128" },
-        { 256.0f, { 4.5f, 1.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "256" }
+        // Top row: 2, 4, 8, 16 (low to high) - individual rotations for proper lighting
+        { 2.0f,   {-4.5f, 3.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "2",   -25.0f },
+        { 4.0f,   {-1.5f, 3.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "4",   -25.0f },
+        { 8.0f,   { 1.5f, 3.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "8",   -25.0f },
+        { 16.0f,  { 4.5f, 3.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "16",  -25.0f },
+        // Bottom row: 32, 64, 128, 256 (low to high) - individual rotations for proper lighting
+        { 32.0f,  {-4.5f, 1.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "32",  -25.0f },
+        { 64.0f,  {-1.5f, 1.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "64",  -25.0f },
+        { 128.0f, { 1.5f, 1.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "128", -25.0f },
+        { 256.0f, { 4.5f, 1.0f,  1.5f}, {orangeColor[0], orangeColor[1], orangeColor[2]}, "256", -25.0f }
     };
 }
 
@@ -157,12 +158,15 @@ void DrawSpecularCube(const SpecularCube& cube) {
     glPushMatrix();
     glTranslatef(cube.position[0], cube.position[1], cube.position[2]);
     
+    // Use individual rotation for each cube to achieve proper lighting
+    glRotatef(cube.rotation, 0.0f, 1.0f, 0.0f);
+    
     // Disable color material to use proper material properties
     glDisable(GL_COLOR_MATERIAL);
     
     // Set material properties for this cube
-    GLfloat ambient[] = { cube.color[0] * 0.3f, cube.color[1] * 0.3f, cube.color[2] * 0.3f, 1.0f };
-    GLfloat diffuse[] = { cube.color[0] * 0.8f, cube.color[1] * 0.8f, cube.color[2] * 0.8f, 1.0f };
+    GLfloat ambient[] = { cube.color[0] * 0.2f, cube.color[1] * 0.2f, cube.color[2] * 0.2f, 1.0f };
+    GLfloat diffuse[] = { cube.color[0] * 0.9f, cube.color[1] * 0.9f, cube.color[2] * 0.9f, 1.0f };
     GLfloat specular[] = { 1.0f, 1.0f, 1.0f, 1.0f }; // White specular highlight
     GLfloat shininess[] = { cube.shininess };
     
@@ -215,22 +219,22 @@ void Display() {
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    // Adjust projection for 2x4 grid arrangement
-    glOrtho(-6, 6, -3, 2, -1, 1);
+    // Adjust projection for 2x4 grid arrangement with better label positioning
+    glOrtho(-8, 8, -4, 3, -1, 1);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
     
     for (const auto& cube : gCubes) {
-        // Position labels under each cube for 2x4 grid arrangement
-        float labelX = cube.position[0] - 0.3f;
+        // Position labels directly under each cube for perfect alignment
+        float labelX = cube.position[0]; // Perfect centering under cubes
         float labelY;
         
-        // Top row labels (Y=3.0) and bottom row labels (Y=1.0)
+        // Calculate label Y position to be directly under each cube
         if (cube.position[1] > 2.0f) { // Top row (Y=3.0)
-            labelY = -1.6f; // Closer to cubes
+            labelY = -1.0f; // Directly under top row cubes
         } else { // Bottom row (Y=1.0)
-            labelY = -2.0f; // Closer to cubes
+            labelY = -2.5f; // Directly under bottom row cubes
         }
         
         DrawText(cube.label, labelX, labelY);
@@ -297,19 +301,19 @@ void InitGL() {
     glEnable(GL_LIGHT0);
     glEnable(GL_COLOR_MATERIAL);
     
-    // Set up light position and properties - adjusted to match original reference
-    GLfloat lightPos[] = { 1.0f, 2.0f, 4.0f, 1.0f }; // Light positioned for better specular highlights
-    GLfloat lightAmbient[] = { 0.1f, 0.1f, 0.1f, 1.0f }; // Lower ambient for better contrast
-    GLfloat lightDiffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f }; // Slightly reduced diffuse
-    GLfloat lightSpecular[] = { 1.0f, 1.0f, 1.0f, 1.0f }; // Strong specular
+    // Set up light position and properties - positioned to match reference image lighting
+    GLfloat lightPos[] = { 3.0f, 4.0f, 2.0f, 1.0f }; // Light from top-right for proper front face illumination
+    GLfloat lightAmbient[] = { 0.05f, 0.05f, 0.05f, 1.0f }; // Very low ambient for dramatic contrast
+    GLfloat lightDiffuse[] = { 0.9f, 0.9f, 0.9f, 1.0f }; // Strong diffuse lighting
+    GLfloat lightSpecular[] = { 1.0f, 1.0f, 1.0f, 1.0f }; // Strong specular highlights
     
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
     glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
     
-    // Set global ambient light - darker for better contrast
-    GLfloat globalAmbient[] = { 0.05f, 0.05f, 0.05f, 1.0f };
+    // Set global ambient light - very dark for dramatic contrast
+    GLfloat globalAmbient[] = { 0.02f, 0.02f, 0.02f, 1.0f };
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
     
     // Enable color material for basic coloring
