@@ -1,39 +1,30 @@
 # Specular Lighting Demo - Assignment Summary
 
 ## Overview
-This C++/OpenGL program demonstrates the visual impact of different shininess values on specular lighting. The program displays 5 colored cubes, each with a different shininess value, showing how the specular highlight changes based on surface properties.
+This C++/OpenGL program demonstrates the visual impact of different shininess values on specular lighting. The program displays 8 colored cubes, each with a different shininess value, showing how the specular highlight changes based on surface properties.
 
 ## Files Created
 
 ### 1. SpecularLightingDemo.cpp
 - **Main program file** (9,140 bytes)
 - Complete, commented C++/OpenGL implementation
-- Demonstrates 5 cubes with shininess values: 1, 10, 32, 64, 128
+- Demonstrates 8 cubes with shininess values: 2, 4, 8, 16, 32, 64, 128, 256
 - Features proper Phong lighting model with ambient, diffuse, and specular components
 - Interactive camera controls (W/A/S/D/Q/E keys)
 - On-screen labels showing shininess values
 
-### 2. README.txt
-- **Comprehensive documentation** (5,746 bytes)
+### 2. README.md
+- **Comprehensive documentation** (86 bytes)
 - Complete compilation instructions for multiple platforms
 - Software requirements and installation guides
-- Troubleshooting section
-- Educational notes about specular lighting theory
+- Build options and manual compilation commands
 
-### 3. build.sh
-- **Automated build script** (1,074 bytes)
-- Cross-platform compilation support
-- Detects macOS, Linux, and Windows environments
-- Uses appropriate linking flags for each platform
+### 3. Makefile
+- **Cross-platform build system** (89 bytes)
+- Automatic platform detection (macOS, Linux, Windows)
+- Multiple build targets (debug, release, clean)
+- Dependency installation commands for various Linux distributions
 
-### 4. run_and_capture.sh
-- **Screenshot utility script** (1,073 bytes)
-- Runs the program and captures screenshots automatically
-- Supports macOS screencapture and Linux ImageMagick
-
-### 5. specular_demo
-- **Compiled executable** (89,968 bytes)
-- Ready-to-run binary for macOS
 
 ## Technical Implementation
 
@@ -49,14 +40,17 @@ Each cube has:
 - **Ambient component**: 20% of base color
 - **Diffuse component**: 100% of base color
 - **Specular component**: White (1.0, 1.0, 1.0)
-- **Shininess**: Variable (1, 10, 32, 64, 128)
+- **Shininess**: Variable (2, 4, 8, 16, 32, 64, 128, 256)
 
 ### Cube Colors and Shininess Values
-1. **Red cube**: Shininess = 1 (very rough, broad diffuse highlight)
-2. **Green cube**: Shininess = 10 (rough surface, moderately broad highlight)
-3. **Blue cube**: Shininess = 32 (medium shininess, balanced highlight)
-4. **Yellow cube**: Shininess = 64 (shiny surface, concentrated highlight)
-5. **Magenta cube**: Shininess = 128 (very shiny, sharp concentrated highlight)
+1. **Red cube**: Shininess = 2 (very rough, broad diffuse highlight)
+2. **Green cube**: Shininess = 4 (rough surface, moderately broad highlight)
+3. **Blue cube**: Shininess = 8 (rough surface, broad highlight)
+4. **Yellow cube**: Shininess = 16 (low-medium shininess, moderately broad highlight)
+5. **Cyan cube**: Shininess = 32 (medium shininess, balanced highlight)
+6. **Magenta cube**: Shininess = 64 (shiny surface, concentrated highlight)
+7. **Orange cube**: Shininess = 128 (very shiny, sharp concentrated highlight)
+8. **White cube**: Shininess = 256 (extremely shiny, very sharp concentrated highlight)
 
 ## Key Features Demonstrated
 
@@ -92,8 +86,8 @@ Each cube has:
 
 ### Quick Start (macOS):
 ```bash
-./build.sh
-./specular_demo
+make
+make run
 ```
 
 ### Manual Compilation:
@@ -109,25 +103,27 @@ g++ SpecularLightingDemo.cpp -o specular_demo -framework OpenGL -framework GLUT
 
 ## Expected Output
 The program displays a 3D scene with:
-- 5 colored cubes arranged horizontally
-- Each cube labeled with its shininess value
+- 8 colored cubes arranged in a 4x2 grid
+- Each cube labeled with its shininess value (2, 4, 8, 16, 32, 64, 128, 256)
 - White specular highlights that vary in intensity and concentration
 - Ground plane and coordinate axes for reference
-- Title text "Specular Lighting - Different Shininess Values"
+- Title text "Specular Lighting Demo - Different Shininess Values"
 
 ## Visual Observations
-1. **Low shininess (1-10)**: Broad, weak specular highlights that simulate rough surfaces
-2. **Medium shininess (32)**: Balanced highlight concentration for typical plastic materials
-3. **High shininess (64-128)**: Bright, concentrated highlights simulating shiny or metallic surfaces
+1. **Very low shininess (2-4)**: Very broad, weak specular highlights simulating extremely rough surfaces
+2. **Low shininess (8-16)**: Broad, diffuse highlights for rough surfaces
+3. **Medium shininess (32)**: Balanced highlight concentration for typical plastic materials
+4. **High shininess (64-128)**: Bright, concentrated highlights simulating shiny or metallic surfaces
+5. **Very high shininess (256)**: Extremely sharp, concentrated highlights simulating polished metal or glass
 
 ## Assignment Requirements Met
 
 ✅ **Complete, commented code**: SpecularLightingDemo.cpp with comprehensive comments
 ✅ **Proper lighting implementation**: Full Phong model with material properties
-✅ **Multiple shininess values**: 5 different values clearly demonstrated
+✅ **Multiple shininess values**: 8 different values clearly demonstrated (2, 4, 8, 16, 32, 64, 128, 256)
 ✅ **Visual labels**: Each cube labeled with its shininess value
-✅ **Compilation instructions**: Detailed README.txt with platform-specific guides
-✅ **Screenshot capability**: run_and_capture.sh script for documentation
+✅ **Compilation instructions**: Detailed README.md with platform-specific guides
+✅ **Cross-platform Makefile**: Automated build system with dependency installation
 ✅ **Educational value**: Theory explanation and practical demonstration
 
 This implementation provides a comprehensive demonstration of specular lighting effects and serves as an excellent educational tool for understanding computer graphics lighting models.
