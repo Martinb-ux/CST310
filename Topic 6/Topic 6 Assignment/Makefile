@@ -15,13 +15,13 @@ ifeq ($(UNAME_S),Darwin)
     LIBS = -framework OpenGL -framework GLUT
 else ifeq ($(UNAME_S),Linux)
     # Linux
-    LIBS = -lglut -lGL -lGLU
+	LIBS = -lGLEW -lglut -lGL -lGLU
 else ifeq ($(OS),Windows_NT)
     # Windows (MinGW/Cygwin)
     LIBS = -lopengl32 -lglu32 -lfreeglut
 else
     # Default to Linux-style libraries
-    LIBS = -lglut -lGL -lGLU
+	LIBS = -lGLEW -lglut -lGL -lGLU
 endif
 
 # Default target
@@ -43,7 +43,7 @@ run: $(TARGET)
 install-deps:
 	@echo "Installing dependencies for Ubuntu/Debian..."
 	sudo apt-get update
-	sudo apt-get install build-essential libgl1-mesa-dev libglu1-mesa-dev libglut-dev
+	sudo apt-get install build-essential libgl1-mesa-dev libglu1-mesa-dev libglut-dev libglew-dev
 
 # Install dependencies (Fedora/CentOS/RHEL)
 install-deps-fedora:
