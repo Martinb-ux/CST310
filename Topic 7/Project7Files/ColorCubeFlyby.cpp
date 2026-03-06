@@ -1,5 +1,5 @@
 // ColorCubeFlyby.cpp
-// Part 2 additions:
+// Part 2 (updated full code):
 //  - r : toggle rotation of the whole scene
 //  - s : stop (pause camera flyby + cube motion)
 //  - c : continue (resume camera flyby + cube motion)
@@ -7,6 +7,8 @@
 //  - +/- : zoom in/out
 //  - multiple cubes with different colors + lighting/brightness
 //  - left/right vertical planes and cube bouncing between them
+//  - KEEP the tumbling effect, but make walls dynamically sized so BOTH walls
+//    always have some visible portion in frame.
 //
 // Note (macOS): OpenGL/GLUT are deprecated. We silence warnings for class work.
 
@@ -45,7 +47,7 @@ GLfloat vertexColors[NUM_VERTICES][3] = {
   {1.0, 0.0, 0.0}, {1.0, 0.0, 1.0}, {1.0, 1.0, 0.0}, {1.0, 1.0, 1.0}
 };
 
-// Draw original RGB color cube (for reference / base object)
+// Draw original RGB color cube (classic vertex-color look)
 void drawRGBColorCube() {
   glBegin(GL_QUADS);
   for (int i = 0; i < NUM_FACES; i++) {
@@ -67,15 +69,19 @@ static float g_sceneRotDeg = 0.0f;  // scene rotation angle
 static float g_sceneY      = 0.0f;  // move whole scene up/down
 static float g_zoom        = 1.0f;  // zoom in/out
 
-// Camera flyby param
+// Flyby camera parameter (time)
 static float g_u = 0.0f;
+
+// View/projection tracking (for dynamic wall sizing)
+static float g_fovyDeg = 75.0f; // feel free to change, used in reshape + wall sizing
+static float g_aspect  = 1.0f;  // updated in reshape()
 
 // Timer settings
 static const int   TIMER_MS      = 16;   // ~60 FPS
 static const float CAMERA_STEP   = 0.01f;
 static const float ROT_STEP_DEG  = 1.0f;
 
-// Bounce planes
+// Bounce planes (walls)
 static const float PLANE_LEFT_X  = -4.0f;
 static const float PLANE_RIGHT_X =  4.0f;
 
@@ -83,18 +89,18 @@ static const float PLANE_RIGHT_X =  4.0f;
 // A simple bouncing cube instance
 // -----------------------------
 struct MovingCube {
-  float x, y, z;
-  float vx;
-  float size;
+  float x, y, z;       // position
+  float vx;            // x velocity
+  float size;          // cube size
 
-  // base color and brightness (illumination feel)
+  // color + "illumination/brightness" feel
   float r, g, b;
-  float brightness;   // multiplies diffuse color
-  float shininess;    // spec highlight strength
+  float brightness;    // multiplies diffuse
+  float shininess;     // specular exponent
 };
 
 static MovingCube g_cubes[] = {
-  // x,   y,   z,   vx,  size,   r,    g,    b,   brightness, shininess
+  // x,    y,    z,     vx,   size,   r,    g,    b,   brightness, shininess
   {-2.5f, 0.3f, 0.0f,  1.2f, 0.7f,  1.0f, 0.2f, 0.2f, 1.00f, 32.0f}, // bright red-ish
   { 0.0f,-0.6f,-0.5f, -1.6f, 0.9f,  0.2f, 1.0f, 0.3f, 0.65f,  8.0f}, // dimmer green-ish
   { 2.2f, 0.8f, 0.7f,  2.0f, 0.6f,  0.3f, 0.4f, 1.0f, 1.25f, 64.0f}  // brighter blue-ish
@@ -110,6 +116,8 @@ static void printState() {
             << ", rotDeg=" << g_sceneRotDeg
             << ", sceneY=" << g_sceneY
             << ", zoom=" << g_zoom
+            << ", fovy=" << g_fovyDeg
+            << ", aspect=" << g_aspect
             << std::endl;
 }
 
@@ -119,9 +127,9 @@ static void printState() {
 static void setupLighting() {
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
-  glEnable(GL_NORMALIZE); // keeps normals correct after scaling
+  glEnable(GL_NORMALIZE); // keep normals correct after scaling
 
-  // Light position (w=1 means positional light)
+  // Light position (w=1 => positional light)
   GLfloat lightPos[] = { 5.0f, 6.0f, 7.0f, 1.0f };
   glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 
@@ -135,12 +143,12 @@ static void setupLighting() {
 }
 
 // -----------------------------
-// Draw a cube centered at origin with proper normals (for lighting)
+// Draw a cube centered at origin with normals (for lighting)
 // -----------------------------
 static void drawLitCube(float size, float r, float g, float b, float brightness, float shininess) {
   const float hs = size * 0.5f;
 
-  // Material: diffuse color scaled by brightness
+  // Material: diffuse scaled by brightness
   GLfloat matAmbient[]  = { 0.15f * r, 0.15f * g, 0.15f * b, 1.0f };
   GLfloat matDiffuse[]  = { brightness * r, brightness * g, brightness * b, 1.0f };
   GLfloat matSpecular[] = { 0.7f, 0.7f, 0.7f, 1.0f };
@@ -198,20 +206,21 @@ static void drawLitCube(float size, float r, float g, float b, float brightness,
 }
 
 // -----------------------------
-// Draw the two vertical planes (left/right) as walls
+// Fixed large walls that always stay visible with consistent appearance
 // -----------------------------
-static void drawWalls() {
-  // Walls should not be shiny like cubes
-  GLfloat wallAmbient[]  = { 0.15f, 0.15f, 0.18f, 1.0f };
-  GLfloat wallDiffuse[]  = { 0.40f, 0.40f, 0.50f, 1.0f };
+static void drawWallsDynamic() {
+  // Lighter wall material - less opaque appearance
+  GLfloat wallAmbient[]  = { 0.4f, 0.4f, 0.45f, 1.0f };
+  GLfloat wallDiffuse[]  = { 0.7f, 0.7f, 0.8f, 1.0f };
   GLfloat wallSpecular[] = { 0.05f, 0.05f, 0.05f, 1.0f };
   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  wallAmbient);
   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  wallDiffuse);
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, wallSpecular);
   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 4.0f);
 
-  const float y0 = -3.0f, y1 = 3.0f;
-  const float z0 = -3.0f, z1 = 3.0f;
+  // Fixed large size - big enough to always stay visible regardless of camera angle
+  const float y0 = -8.0f, y1 = 8.0f;
+  const float z0 = -8.0f, z1 = 8.0f;
 
   glBegin(GL_QUADS);
 
@@ -239,16 +248,19 @@ static void drawWalls() {
 void display() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // Camera (flyby) based on g_u
+  // Camera position from flyby curve
+  float camX = 8.0f * std::cos(g_u);
+  float camY = 7.0f * std::cos(g_u) - 1.0f;
+  float camZ = 4.0f * std::cos(g_u / 3.0f) + 2.0f;
+
+  // Camera look-at (KEEP tumbling effect by varying the up vector)
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  gluLookAt(8 * std::cos(g_u),
-            7 * std::cos(g_u) - 1,
-            4 * std::cos(g_u / 3) + 2,
+  gluLookAt(camX, camY, camZ,
             0.5, 0.5, 0.5,
             std::cos(g_u), 1, 0);
 
-  // Apply whole-scene transforms: move up/down, zoom, then optional rotation
+  // Apply whole-scene transforms (move/zoom/optional rotation)
   glPushMatrix();
   glTranslatef(0.0f, g_sceneY, 0.0f);
   glScalef(g_zoom, g_zoom, g_zoom);
@@ -256,14 +268,14 @@ void display() {
     glRotatef(g_sceneRotDeg, 0.0f, 1.0f, 0.0f); // rotate around Y axis
   }
 
-  // Draw walls
-  drawWalls();
+  // Draw dynamic walls first so they are always visible reference planes
+  drawWallsDynamic();
 
-  // Draw original RGB cube (unlit colors) as the "starting cube"
-  // Temporarily disable lighting so the classic vertex colors show clearly.
+  // Draw original RGB cube (unlit vertex colors)
+  // Temporarily disable lighting so vertex colors show clearly.
   glDisable(GL_LIGHTING);
   glPushMatrix();
-    glTranslatef(-0.5f, -0.5f, -0.5f); // original cube is from (0..1), recenter
+    glTranslatef(-0.5f, -0.5f, -0.5f); // recenter original (0..1) cube around origin
     Cube::drawRGBColorCube();
   glPopMatrix();
   glEnable(GL_LIGHTING);
@@ -312,7 +324,7 @@ void timer(int /*v*/) {
     }
   }
 
-  // Rotation can be thought of as “whole image rotation” toggle via r
+  // Whole-scene rotation toggled by 'r'
   if (g_rotateScene) {
     g_sceneRotDeg += ROT_STEP_DEG;
     if (g_sceneRotDeg >= 360.0f) g_sceneRotDeg -= 360.0f;
@@ -324,15 +336,20 @@ void timer(int /*v*/) {
 
 // -----------------------------
 // reshape()
-// Sets viewport + projection.
+// Sets viewport + projection and stores aspect for wall sizing.
 // -----------------------------
 void reshape(int w, int h) {
   if (h == 0) h = 1;
 
+  g_aspect = (float)w / (float)h;
+
   glViewport(0, 0, w, h);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(60.0, GLfloat(w) / GLfloat(h), 0.5, 40.0);
+
+  // Use g_fovyDeg so wall sizing math matches what the camera sees
+  gluPerspective(g_fovyDeg, g_aspect, 0.5, 60.0);
+
   glMatrixMode(GL_MODELVIEW);
 }
 
@@ -410,10 +427,12 @@ void init() {
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
 
+  // Depth test is needed now that we have multiple objects + planes
   glEnable(GL_DEPTH_TEST);
 
   setupLighting();
 
+  // Background color
   glClearColor(0.06f, 0.06f, 0.08f, 1.0f);
 }
 
