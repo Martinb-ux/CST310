@@ -47,13 +47,26 @@ g++ main.cpp -o run -L/opt/homebrew/lib -lglfw3 -framework OpenGL -framework Coc
 ## Controls
 
 ### Camera Movement
-- **Arrow Keys**: Move camera (left/right/up/down)
-- **Shift + Arrow Keys**: Roll camera
-- **Control + Arrow Keys**: Pitch and Yaw camera
-- **R**: Reset camera to origin
+- **Right Arrow**: Slide camera 1 unit in the positive X direction
+- **Left Arrow**: Slide camera 1 unit in the negative X direction  
+- **Up Arrow**: Slide camera 1 unit in the positive Y direction
+- **Down Arrow**: Slide camera 1 unit in the negative Y direction
+- **Shift + Up Arrow**: Slide camera 1 unit in the positive Z ("in") direction
+- **Shift + Down Arrow**: Slide camera 1 unit in the negative Z ("out") direction
+- **Command + Up Arrow**: Change camera pitch by -2 degrees
+- **Command + Down Arrow**: Change camera pitch by 2 degrees
+- **Command + Right Arrow**: Change camera yaw by 2 degrees
+- **Command + Left Arrow**: Change camera yaw by -2 degrees
+- **Shift + Comma (<)**: Change camera roll by 2 degrees
+- **Shift + Period (>)**: Change camera roll by -2 degrees
+- **R**: Reset to the default position and orientation
 
 ### Exit
 - **ESC**: Close the application
+
+### Notes
+- **Command key** refers to the ⌘ key on Mac keyboards
+- For non-Mac systems, use the Control key instead
 
 ## File Structure
 

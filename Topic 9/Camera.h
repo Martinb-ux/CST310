@@ -15,6 +15,8 @@ enum Camera_Movement {
 	RIGHT, // Move along x-axis
 	UP, // Move along y-axis
 	DOWN, // Move along y-axis
+	FORWARDZ, // Move along positive world Z axis
+	BACKWARDZ, // Move along negative world Z axis
 	UPPITCH, // Rotate pitch positive
 	DOWNPITCH, // Rotate pitch negative
 	UPYAW, // Rotate yaw positive
@@ -91,24 +93,34 @@ public:
 			Position += Up * velocity; // Add up * velocity to position
 		if (direction == DOWN) // If down
 			Position -= Up * velocity; // Subtract up * velocity to position
-		if (direction == UPPITCH) // If up pitch
+		if (direction == FORWARDZ) // If forward along world Z
+			Position.z += velocity; // Add velocity to Z position
+		if (direction == BACKWARDZ) // If backward along world Z
+			Position.z -= velocity; // Subtract velocity from Z position
+		if (direction == UPPITCH) { // If up pitch
 			Pitch += 2.0f; // Increment pitch by 2 [degrees]
 			updateCameraVectors(); // Update rotation using callback
-		if (direction == DOWNPITCH) // If down pitch
+		}
+		if (direction == DOWNPITCH) { // If down pitch
 			Pitch -= 2.0f; // Decrement pitch by 2 [degrees]
 			updateCameraVectors(); // Update rotation using callback
-		if (direction == UPYAW) // If up yaw
+		}
+		if (direction == UPYAW) { // If up yaw
 			Yaw += 2.0f; // Increment yaw by 2 [degrees]
 			updateCameraVectors(); // Update rotation using callback
-		if (direction == DOWNYAW) // If down yaw
+		}
+		if (direction == DOWNYAW) { // If down yaw
 			Yaw -= 2.0f; // Decrement yaw by 2 [degrees]
 			updateCameraVectors(); // Update rotation using callback
-		if (direction == UPROLL) // If up roll
+		}
+		if (direction == UPROLL) { // If up roll
 			Roll += 2.0f; // Increment roll by 2 [degrees]
 			updateCameraVectors(); // Update rotation using callback
-		if (direction == DOWNROLL) // If down roll
+		}
+		if (direction == DOWNROLL) { // If down roll
 			Roll -= 2.0f; // Decrement roll by 2 [degrees]
 			updateCameraVectors(); // Update rotation using callback
+		}
 	}
 
 	// Resets camera position and rotation vectors
