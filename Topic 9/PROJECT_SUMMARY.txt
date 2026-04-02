@@ -1,0 +1,101 @@
+Topic 9 - OpenGL 3D Scene Project
+=====================================
+
+This project creates an interactive 3D scene with a checkerboard floor, cube, cylinder, and sphere using modern OpenGL.
+
+SCENE OBJECTS:
+-------------
+1. Checkerboard Floor - 8x8 grid with alternating purple and white tiles
+2. Red Cube - Central 3D cube rendered with vertex arrays
+3. Green Cylinder - OBJ model positioned to the left of the cube
+4. Blue Sphere - OBJ model positioned to the right of the cube
+
+CAMERA CONTROLS (Mac):
+---------------------
+Movement:
+- Right Arrow: Slide camera +X (right)
+- Left Arrow: Slide camera -X (left)
+- Up Arrow: Slide camera +Y (up)
+- Down Arrow: Slide camera -Y (down)
+- Shift + Up Arrow: Slide camera "out" (negative Z)
+- Shift + Down Arrow: Slide camera "in" (positive Z)
+
+Rotation:
+- Command + Up Arrow: Pitch -2 degrees
+- Command + Down Arrow: Pitch +2 degrees
+- Command + Right Arrow: Yaw +2 degrees
+- Command + Left Arrow: Yaw -2 degrees
+- Shift + Comma (<): Roll +2 degrees
+- Shift + Period (>): Roll -2 degrees
+
+Other:
+- R: Reset camera to origin
+- ESC: Exit application
+
+SOFTWARE REQUIREMENTS:
+---------------------
+macOS with Homebrew installed
+
+Required Libraries:
+- GLFW (Window management)
+- GLEW (OpenGL extension loading)
+- Assimp (3D model loading)
+- GLM (Mathematics library)
+- stb_image (Image loading - included)
+
+INSTALLATION:
+-------------
+Install dependencies via Homebrew:
+brew install glfw glew assimp glm
+
+COMPILATION:
+-------------
+Using Makefile (Recommended):
+make          # Build the project
+make execute  # Build and run
+
+Manual Compilation:
+g++ main.cpp -o run -L/opt/homebrew/lib -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -lGLEW -lassimp
+
+RUNNING:
+-------
+./run
+
+FILES:
+------
+main.cpp          - Main application with rendering loop and camera controls
+Camera.h          - Camera class with movement and rotation
+Model.h           - 3D model loading class (uses stb_image)
+Mesh.h            - Mesh rendering class
+shader.h          - Shader program wrapper
+stb_image.h       - Image loading library
+*.vs, *.frag      - Vertex and fragment shaders
+*.obj, *.mtl      - 3D model files
+Makefile          - Build configuration
+README.md         - Detailed documentation
+
+KEY FEATURES:
+-------------
+- Modern OpenGL 3.3 Core Profile
+- OBJ model loading with Assimp
+- Phong lighting system
+- Interactive camera with full 6DOF movement
+- Cross-platform compatible (Mac optimized)
+- Clean, commented code structure
+
+TROUBLESHOOTING:
+---------------
+- Ensure all Homebrew libraries are installed
+- Check that Xcode Command Line Tools are installed
+- Verify OBJ and MTL files are present in the same directory
+- Make sure OpenGL 3.3+ is supported by your system
+
+PROJECT STRUCTURE:
+-----------------
+The scene is arranged as:
+- Cube: Center (0.0, 0.0, -5.0)
+- Cylinder: Left (-1.8, -3.0, -5.5) 
+- Sphere: Right (1.2, 0.0, -5.0)
+- Checkerboard: 8x8 grid from (-4, -9) to (4, -1)
+
+All objects are rendered with basic lighting and can be viewed from any angle using the camera controls.

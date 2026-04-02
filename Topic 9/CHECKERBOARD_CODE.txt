@@ -1,0 +1,123 @@
+// CHECKERBOARD RENDERING CODE
+// This section renders an 8x8 checkerboard floor with alternating colors
+
+// Checkerboard rendering in main.cpp (lines 169-205)
+checkerboardShader.Use(); // Activate checkerboard shader
+
+// Get uniform locations for lighting and colors
+GLint squareColorLoc = glGetUniformLocation(checkerboardShader.Program, "squareColor");
+GLint lightColorLoc = glGetUniformLocation(checkerboardShader.Program, "lightColor");
+GLint lightPosLoc = glGetUniformLocation(checkerboardShader.Program, "lightPos");
+GLint viewPosLoc = glGetUniformLocation(checkerboardShader.Program, "viewPos");
+
+// Set lighting parameters
+glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f); // White light
+glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z); // Light position
+glUniform3f(viewPosLoc, camera.Position.x, camera.Position.y, camera.Position.z); // Camera position
+
+// Create view matrix for checkerboard
+glm::mat4 view_square = view;
+
+// Get transformation uniform locations
+GLint modelLoc = glGetUniformLocation(checkerboardShader.Program, "model");
+GLint viewLoc = glGetUniformLocation(checkerboardShader.Program, "view");
+GLint projLoc = glGetUniformLocation(checkerboardShader.Program, "projection");
+
+// Render 8x8 checkerboard grid
+for (int i = 0; i < 8; i++) {        // 8 rows
+    for (int j = 0; j < 8; j++) {    // 8 columns
+        // Alternate colors based on position
+        if ((i+j) % 2 == 0) {
+            glUniform3f(squareColorLoc, 1.0f, 0.0f, 1.0f); // Purple squares
+        } else {
+            glUniform3f(squareColorLoc, 1.0f, 1.0f, 1.0f); // White squares
+        }
+        
+        // Position each square in the grid
+        // Translate: j-4.0f moves horizontally (-4 to +4)
+        //            i-9.0f moves depth-wise (-9 to -1)
+        view_square = glm::translate(view_square, glm::vec3(j-4.0f, -0.5f, i-9.0f));
+        
+        // Scale squares to be flat tiles
+        view_square = glm::scale(view_square, glm::vec3(1.0f, 0.1f, 1.0f));
+        
+        // Send transformations to shader
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view_square));
+        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+        
+        // Draw the square using cube vertices (36 triangles = 12 triangles per face * 3 vertices)
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        
+        // Reset view for next square (translations are independent)
+        view_square = view;
+    }
+}
+
+// Vertex data for cube (used for all squares) - main.cpp (lines 73-122)
+GLfloat vertices[] = {
+    // Position (3), Color (3), Normal (3), Texture (2)
+    // Back face
+    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  0.0f, -1.0f,
+    0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,  0.0f, -1.0f,
+    0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f,  0.0f, -1.0f,
+    // ... (continues for all 6 faces)
+};
+
+// Checkerboard vertex shader (checkerboard.vs)
+#version 330 core
+layout (location = 0) in vec3 position;    // Vertex position
+layout (location = 2) in vec2 texCoords;   // Texture coordinates
+layout (location = 4) in vec3 normal;      // Surface normal
+
+out vec3 Normal;       // Pass normal to fragment shader
+out vec3 FragPos;      // Pass fragment position to fragment shader
+out vec2 TexCoords;    // Pass texture coordinates to fragment shader
+
+uniform mat4 model;    // Model transformation
+uniform mat4 view;     // View transformation
+uniform mat4 projection; // Projection transformation
+
+void main() {
+    gl_Position = projection * view * model * vec4(position, 1.0f);
+    FragPos = vec3(model * vec4(position, 1.0f));
+    Normal = mat3(transpose(inverse(model))) * normal;
+    TexCoords = texCoords;
+}
+
+// Checkerboard fragment shader (checkerboard.frag)
+#version 330 core
+in vec3 Normal;        // Surface normal from vertex shader
+in vec3 FragPos;       // Fragment position from vertex shader
+in vec2 TexCoords;     // Texture coordinates from vertex shader
+
+out vec4 color;        // Final output color
+
+uniform vec3 squareColor;  // Color for current square (set in main loop)
+uniform vec3 lightColor;   // Light color (white)
+uniform vec3 lightPos;     // Light position
+uniform vec3 viewPos;      // Camera position
+
+void main() {
+    // Ambient lighting
+    float ambientStrength = 0.1f;
+    vec3 ambient = ambientStrength * lightColor;
+    
+    // Diffuse lighting
+    vec3 norm = normalize(Normal);
+    vec3 lightDir = normalize(lightPos - FragPos);
+    float diff = max(dot(norm, lightDir), 0.0f);
+    vec3 diffuse = diff * lightColor;
+    
+    // Specular lighting
+    float specularStrength = 0.5f;
+    vec3 viewDir = normalize(viewPos - FragPos);
+    vec3 reflectDir = reflect(-lightDir, norm);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 32.0f);
+    vec3 specular = specularStrength * spec * lightColor;
+    
+    // Combine lighting with square color
+    vec3 result = (ambient + diffuse + specular) * squareColor;
+    color = vec4(result, 1.0f);
+}
