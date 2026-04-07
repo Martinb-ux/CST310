@@ -18,6 +18,17 @@ An OpenGL application that renders a 3D scene with a checkerboard floor, cube, c
 brew install glfw glew assimp glm
 ```
 
+### Ubuntu/Debian
+```bash
+sudo apt-get update
+sudo apt-get install -y libglfw3-dev libglew-dev libassimp-dev libglm-dev libgl1-mesa-dev
+```
+
+### Using Makefile (Cross-platform)
+```bash
+make install-deps  # Automatically detects OS and installs dependencies
+```
+
 ### Required Libraries
 - **GLFW**: Window management and input handling
 - **GLEW**: OpenGL extension loading
@@ -34,8 +45,20 @@ make execute  # Build and run the project
 ```
 
 ### Manual Compilation
+
+#### macOS
 ```bash
-g++ main.cpp -o run -L/opt/homebrew/lib -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -lGLEW -lassimp
+g++ src/main.cpp -o run -L/opt/homebrew/lib -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -lGLEW -lassimp -Iinclude
+```
+
+#### Ubuntu/Debian
+```bash
+g++ src/main.cpp -o run -lglfw -lGLEW -lassimp -lGL -Iinclude
+```
+
+#### Cross-platform (Recommended)
+```bash
+make  # Automatically detects OS and uses appropriate flags
 ```
 
 ## Running
@@ -72,17 +95,27 @@ g++ main.cpp -o run -L/opt/homebrew/lib -lglfw3 -framework OpenGL -framework Coc
 
 ```
 Topic 9/
-├── main.cpp              # Main application entry point
-├── shader.h              # Shader class wrapper
-├── Camera.h              # Camera implementation
-├── Model.h               # 3D model loading class
-├── Mesh.h                # Mesh rendering class
-├── stb_image.h           # Image loading library
-├── *.vs                  # Vertex shader files
-├── *.frag                # Fragment shader files
-├── *.obj                 # 3D model files
-├── *.mtl                 # Material files
-├── Makefile              # Build configuration
+├── src/                    # Source code files
+│   └── main.cpp           # Main application entry point
+├── include/                # Header files
+│   ├── Camera.h           # Camera class with movement controls
+│   ├── Model.h            # 3D model loading class
+│   ├── Mesh.h             # Mesh rendering class
+│   ├── shader.h           # Shader program wrapper
+│   └── stb_image.h        # Image loading library
+├── shaders/                # OpenGL shader files
+│   ├── checkerboard.vs/.frag # Checkerboard floor shaders
+│   ├── cube.vs/.frag      # Cube rendering shaders
+│   ├── cylinder.vs/.frag  # Cylinder rendering shaders
+│   └── sphere.vs/.frag    # Sphere rendering shaders
+├── models/                 # 3D model files
+│   ├── cylinder.obj/.mtl  # Cylinder model and materials
+│   └── sphere.obj/.mtl    # Sphere model and materials
+├── docs/                   # Documentation
+│   ├── PROJECT_SUMMARY.txt # Complete project overview
+│   └── FOLDER_STRUCTURE.md # Folder structure documentation
+├── screenshot/             # Screenshots
+├── Makefile               # Build configuration
 └── README.md             # This file
 ```
 
@@ -110,4 +143,11 @@ Topic 9/
 ### Runtime Issues
 - The application requires OpenGL 3.3 core profile
 - Ensure your graphics drivers are up to date
-- Check that OBJ and MTL files are present in the same directory as the executable
+- Check that OBJ and MTL files are present in the `models/` directory
+- Verify shader files are in the `shaders/` directory
+- Make sure header files are in the `include/` directory
+
+### Build Issues with New Structure
+- Use `make` from the project root directory (not from subdirectories)
+- The Makefile automatically handles include paths for the new structure
+- Manual compilation requires `-Iinclude` flag for header files

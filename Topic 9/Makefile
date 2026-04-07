@@ -18,21 +18,30 @@ OBJECTS = $(SOURCES:.cpp=.o)
 # Library paths and includes
 # Check if we're on Apple Silicon or Intel Mac
 UNAME_M := $(shell uname -m)
-ifeq ($(UNAME_M),arm64)
-    # Apple Silicon Mac
-    LIB_PATH = /opt/homebrew/lib
-    INCLUDE_PATH = /opt/homebrew/include
+UNAME_S := $(shell uname -s)
+
+ifeq ($(UNAME_S),Darwin)
+    # macOS
+    ifeq ($(UNAME_M),arm64)
+        # Apple Silicon Mac
+        LIB_PATH = /opt/homebrew/lib
+        INCLUDE_PATH = /opt/homebrew/include
+    else
+        # Intel Mac
+        LIB_PATH = /usr/local/lib
+        INCLUDE_PATH = /usr/local/include
+    endif
+    # macOS-specific libraries and frameworks
+    LIBS = -L$(LIB_PATH) -lglfw3 -lGLEW -lassimp
+    FRAMEWORKS = -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
 else
-    # Intel Mac
+    # Linux/Ubuntu
     LIB_PATH = /usr/local/lib
     INCLUDE_PATH = /usr/local/include
+    # Linux-specific libraries (no frameworks)
+    LIBS = -L$(LIB_PATH) -lglfw -lGLEW -lassimp -lGL
+    FRAMEWORKS =
 endif
-
-# Libraries to link
-LIBS = -L$(LIB_PATH) -lglfw3 -lGLEW -lassimp
-
-# macOS-specific frameworks
-FRAMEWORKS = -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
 
 # Include directories
 INCLUDES = -I$(INCLUDE_PATH) -Iinclude
@@ -55,9 +64,14 @@ $(TARGET): $(OBJECTS)
 clean:
 	rm -f $(OBJECTS) $(TARGET)
 
-# Install dependencies (macOS with Homebrew)
+# Install dependencies
 install-deps:
-	brew install glfw glew assimp glm
+	@echo "Installing dependencies for $(UNAME_S)..."
+	@if [ "$(UNAME_S)" = "Darwin" ]; then \
+		brew install glfw glew assimp glm; \
+	else \
+		sudo apt-get update && sudo apt-get install -y libglfw3-dev libglew-dev libassimp-dev libglm-dev libgl1-mesa-dev; \
+	fi
 
 # Run the application
 execute: $(TARGET)
@@ -69,12 +83,19 @@ debug: $(TARGET)
 
 # Check dependencies
 check-deps:
-	@echo "Checking for required dependencies..."
-	@brew list glfw > /dev/null 2>&1 || echo "❌ GLFW not found. Run 'make install-deps'"
-	@brew list glew > /dev/null 2>&1 || echo "❌ GLEW not found. Run 'make install-deps'"
-	@brew list assimp > /dev/null 2>&1 || echo "❌ Assimp not found. Run 'make install-deps'"
-	@brew list glm > /dev/null 2>&1 || echo "❌ GLM not found. Run 'make install-deps'"
-	@test -f stb_image.h || echo "❌ stb_image.h not found in current directory"
+	@echo "Checking for required dependencies on $(UNAME_S)..."
+	@if [ "$(UNAME_S)" = "Darwin" ]; then \
+		brew list glfw > /dev/null 2>&1 || echo "❌ GLFW not found. Run 'make install-deps'"; \
+		brew list glew > /dev/null 2>&1 || echo "❌ GLEW not found. Run 'make install-deps'"; \
+		brew list assimp > /dev/null 2>&1 || echo "❌ Assimp not found. Run 'make install-deps'"; \
+		brew list glm > /dev/null 2>&1 || echo "❌ GLM not found. Run 'make install-deps'"; \
+	else \
+		pkg-config --exists glfw3 || echo "❌ GLFW not found. Run 'make install-deps'"; \
+		pkg-config --exists glew || echo "❌ GLEW not found. Run 'make install-deps'"; \
+		pkg-config --exists assimp || echo "❌ Assimp not found. Run 'make install-deps'"; \
+		pkg-config --exists glm || echo "❌ GLM not found. Run 'make install-deps'"; \
+	fi
+	@test -f include/stb_image.h || echo "❌ stb_image.h not found in include/ directory"
 	@echo "✅ Dependency check complete"
 
 # Help target
