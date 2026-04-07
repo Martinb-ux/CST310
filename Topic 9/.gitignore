@@ -1,0 +1,24 @@
+# Build artifacts
+run
+*.o
+*.exe
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# Large files
+*.mov
+*.mp4
+*.avi
+*.mkv
+video/
+
+# Temporary files
+*.tmp
+*.temp
