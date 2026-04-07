@@ -10,7 +10,7 @@ CXXFLAGS = -std=c++11 -Wall -Wextra -O2
 TARGET = run
 
 # Source files
-SOURCES = main.cpp
+SOURCES = src/main.cpp
 
 # Object files
 OBJECTS = $(SOURCES:.cpp=.o)
@@ -35,7 +35,10 @@ LIBS = -L$(LIB_PATH) -lglfw3 -lGLEW -lassimp
 FRAMEWORKS = -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
 
 # Include directories
-INCLUDES = -I$(INCLUDE_PATH)
+INCLUDES = -I$(INCLUDE_PATH) -Iinclude
+
+# VPATH for source files
+VPATH = src
 
 # Default target
 all: $(TARGET)
