@@ -1,0 +1,147 @@
+# Topic 10 - Advanced Shading Techniques
+# Environment Mapping, Parallax Mapping, and Bump Mapping
+
+## Project Overview
+This project implements three advanced shading techniques on different 3D objects:
+- **Cube**: Environment Mapping (Cube Mapping) using Yokohama2 cube map
+- **Sphere**: Parallax Mapping using Bump-Map.jpg (height map) and Bump-Picture.jpg (diffuse map)
+- **Cylinder**: Bump Mapping using Bump-Map.jpg (normal map) and Bump-Picture.jpg (diffuse map)
+
+## Software Requirements
+- **Operating System**: macOS (Apple Silicon or Intel), Linux, or Windows
+- **Compiler**: clang++ (macOS) or g++ (Linux/Windows)
+- **OpenGL 3.3+** compatible graphics drivers
+- **CMake** (optional, for alternative build system)
+
+## Dependencies Installation
+
+### macOS (using Homebrew)
+```bash
+brew install glfw glew assimp glm
+```
+
+### Linux/Ubuntu
+```bash
+sudo apt-get update
+sudo apt-get install libglfw3-dev libglew-dev libassimp-dev libglm-dev libgl1-mesa-dev
+```
+
+### Windows
+- Download and install GLFW, GLEW, Assimp, and GLM
+- Ensure Visual Studio or MinGW is properly configured
+
+## Build Instructions
+
+### Option 1: Using the provided Makefile
+```bash
+cd /path/to/Topic 10
+make
+```
+
+### Option 2: Manual compilation (macOS)
+```bash
+clang++ src/main.cpp -o run \
+  -L/opt/homebrew/lib \
+  -lglfw3 -lGLEW -lassimp \
+  -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo \
+  -I/opt/homebrew/include -Iinclude
+```
+
+### Option 3: Manual compilation (Linux)
+```bash
+g++ src/main.cpp -o run \
+  -lglfw -lGLEW -lassimp -lGL \
+  -I/usr/local/include -Iinclude
+```
+
+## Run Instructions
+```bash
+./run
+```
+
+## Camera Controls
+The application features a virtual camera for fly-by navigation:
+
+### Movement Controls
+- **Arrow Keys**: Move camera (Up/Down/Left/Right)
+- **Shift + Arrow Keys**: Move along Z-axis (forward/backward)
+- **Command/Cmd + Arrow Keys**: Camera rotation (pitch/yaw)
+- **Shift + Comma/Period**: Camera roll
+- **R**: Reset camera to initial position
+
+## File Structure
+```
+Topic 10/
+├── src/
+│   └── main.cpp              # Main application code
+├── shaders/
+│   ├── sphere.vs/.frag       # Environment mapping shaders
+│   ├── cube.vs/.frag         # Parallax mapping shaders
+│   ├── cylinder.vs/.frag     # Bump mapping shaders
+│   └── checkerboard.vs/.frag # Checkerboard floor shaders
+├── pictures/
+│   ├── Bump-Map.jpg          # Height/Normal map for cube and cylinder
+│   ├── Bump-Picture.jpg      # Diffuse texture for cube and cylinder
+│   └── Yokohama2/            # Cube map images for environment mapping
+│       ├── posx.jpg, negx.jpg
+│       ├── posy.jpg, negy.jpg
+│       ├── posz.jpg, negz.jpg
+├── models/
+│   ├── cylinder.obj          # Cylinder model
+│   └── sphere.obj            # Sphere model
+├── include/                  # Header files
+├── Makefile                  # Build configuration
+└── instructions.txt          # This file
+```
+
+## Shading Techniques Implemented
+
+### 1. Environment Mapping (Cube)
+- Uses cube mapping to reflect the surrounding environment
+- Yokohama2 cube map provides realistic reflections
+- Implements proper reflection calculations using view vectors
+
+### 2. Parallax Mapping (Sphere)
+- Creates depth illusion using height maps
+- Parallax Occlusion Mapping for enhanced realism
+- Bump-Map.jpg provides height information
+- Adjustable height scale parameter
+
+### 3. Bump Mapping (Cylinder)
+- Uses normal maps to simulate surface detail
+- Tangent space calculations for proper lighting
+- Bump-Map.jpg used as normal map
+- Enhanced surface detail without additional geometry
+
+## Troubleshooting
+
+### Common Issues
+1. **Compilation errors**: Ensure all dependencies are properly installed
+2. **Missing textures**: Verify all image files are in the pictures/ directory
+3. **Black screen**: Check graphics drivers and OpenGL 3.3+ support
+4. **Window doesn't open**: Verify GLFW installation and display server
+
+### Texture Loading Issues
+- Ensure image files are in JPEG format
+- Check file paths in main.cpp match actual file locations
+- Verify stb_image.h is in the include/ directory
+
+### Performance Issues
+- Reduce texture resolution if running on older hardware
+- Adjust parallax mapping quality parameters
+- Disable specular highlights for better performance
+
+## Video Recording Instructions
+For the course assignment, create a video demonstrating:
+1. Fly-by camera movement around all three objects
+2. Close-up shots showing each shading technique
+3. Camera movements that highlight the reflective, parallax, and bump effects
+4. Upload to Loom, YouTube, or Vimeo with public access
+
+## Technical Notes
+- OpenGL 3.3 Core Profile
+- GLFW for window management
+- GLEW for OpenGL extension loading
+- Assimp for 3D model loading
+- GLM for mathematics
+- Custom shader implementation for each technique
